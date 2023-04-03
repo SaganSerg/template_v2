@@ -161,4 +161,10 @@ router.get('/download', (req, res, next) => {
 router.get('/somethingwrong', (req, res, next) => { 
     res.send('something went wrong!') // это заглушка
 })
+
+router.get('/other', (req, res, next) => {
+        res.render('otherPage', {
+            layout: 'other', 
+            lang: req[projectSymbolName]['lang']})
+})
 module.exports = router;
