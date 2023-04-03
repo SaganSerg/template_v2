@@ -1,6 +1,6 @@
 const express = require('express')
 const commonVar = require('../lib/commonVar')
-const {checkSum} = require('../lib/checkSum')
+const { checkSum } = require('../lib/checkSum')
 const projectSymbolName = commonVar.projectName // мы получили символьное имя для собстенных свойств в объектах express
 const langManager = require('../lib/langManager')
 const getParamMain = require('../lib/getParamMainPage')
@@ -81,7 +81,7 @@ router.get('/:lang/cabinet', (req, res, next) => {
                     customer: req.session.passport.user.username
                 }
                 ),
-            getParamMain(dictionary, req, res, { mainNav: {}})
+                getParamMain(dictionary, req, res, { mainNav: {} })
             )
             )
         }
@@ -93,19 +93,19 @@ router.get('/:lang/file', (req, res, next) => {
     langManager.checkLangWrapper(req, res, next, (dictionary) => {
         checkAccounеAccess(req, res, dictionary, (res, req, dictionary) => {
             res.render('file', Object.assign(
-                    require('./../views/file').pageElements(dictionary, {
-                        currentUrl: '/file',
-                        customer: req.session.passport.user.username
+                require('./../views/file').pageElements(dictionary, {
+                    currentUrl: '/file',
+                    customer: req.session.passport.user.username
+                }
+                ),
+                getParamMain(dictionary, req, res, {
+                    mainNav: {
+                        classFile: 'current',
                     }
-                    ),
-                    getParamMain(dictionary, req, res, {
-                        mainNav: {
-                            classFile: 'current',
-                        }
-                    }),
-        
-                )
-                )
+                }),
+
+            )
+            )
         }
         )
     }
@@ -114,27 +114,27 @@ router.get('/:lang/file', (req, res, next) => {
 router.post('/file/upload', (req, res, next) => {
     const form = new multiparty.Form()
     form.parse(req, (err, fields, files) => {
-        if(err) throw err
+        if (err) throw err
         const file = files.file[0];
         const filePath = file.path;
         const fileContent = fs.readFileSync(filePath);
-        if (! checkSum(fileContent, fields.checksum)) return res.redirect(303, '/somethingwrong')
+        if (!checkSum(fileContent, fields.checksum)) return res.redirect(303, '/somethingwrong')
         const customerId = (req.session?.passport?.user) ? req.session.passport.user.id : null
         if (!customerId) return next()
         db.run(
             `INSERT INTO file (customer_id, file_file) VALUES (?, ?)`,
-            [customerId, fileContent], 
+            [customerId, fileContent],
             function (err, row) {
-                if (err) throw err 
+                if (err) throw err
                 if (!row) return next()
                 res.redirect(303, '/fileIsGet')
             });
-        
+
     })
 })
 router.get('/fileIsGet', (req, res, next) => {
     res.send('file is get') // это заглушка
-}) 
+})
 
 router.get('/download', (req, res, next) => {
     const customerId = (req.session?.passport?.user) ? req.session.passport.user.id : null
@@ -158,13 +158,24 @@ router.get('/download', (req, res, next) => {
         }
     )
 })
-router.get('/somethingwrong', (req, res, next) => { 
+router.get('/somethingwrong', (req, res, next) => {
     res.send('something went wrong!') // это заглушка
 })
 
 router.get('/other', (req, res, next) => {
-        res.render('otherPage', {
-            layout: 'other', 
-            lang: req[projectSymbolName]['lang']})
+    res.render('otherPage', {
+        layout: 'other',
+        lang: req[projectSymbolName]['lang']
+    })
 })
+
+router.get('/get-version', (req, res, next) => {
+    res.json({ version: process.version });
+});
+router.get('/version', (req, res, next) => {
+    res.render('version', {
+        layout: null
+    })
+})
+
 module.exports = router;

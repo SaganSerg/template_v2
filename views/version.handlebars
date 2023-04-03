@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Node.js Version</title>
+  </head>
+  <body>
+    <button onclick="getVersion()">Get Node.js Version</button>
+    <p id="version"></p>
+    <script>
+      function getVersion() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            document.getElementById('version').innerHTML = 'Node.js Version: ' + this.responseText;
+          }
+        };
+        xhr.open('GET', '/get-version', true);
+        xhr.send();
+      }
+    </script>
+  </body>
+</html>
